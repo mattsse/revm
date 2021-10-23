@@ -1,10 +1,11 @@
 use crate::{collection::vec::Vec, error::ExitError};
 use primitive_types::H256;
+use smallvec::SmallVec;
 
 /// EVM stack.
 #[derive(Clone, Debug)]
 pub struct Stack {
-    data: Vec<H256>,
+    data: SmallVec<[H256; 15]>,
     limit: usize,
 }
 
@@ -12,7 +13,7 @@ impl Stack {
     /// Create a new stack with given limit.
     pub fn new(limit: usize) -> Self {
         Self {
-            data: Vec::new(),
+            data: SmallVec::new(),
             limit,
         }
     }
@@ -37,7 +38,7 @@ impl Stack {
 
     #[inline]
     /// Stack data.
-    pub fn data(&self) -> &Vec<H256> {
+    pub fn data(&self) -> &SmallVec<[H256; 15]> {
         &self.data
     }
 

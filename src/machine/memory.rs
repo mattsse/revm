@@ -8,12 +8,13 @@ use core::{
     ops::{BitAnd, Not},
 };
 use primitive_types::U256;
+use smallvec::SmallVec;
 
 /// A sequencial memory. It uses Rust's `Vec` for internal
 /// representation.
 #[derive(Clone, Debug)]
 pub struct Memory {
-    data: Vec<u8>,
+    data: SmallVec<[u8; 1024]>,
     effective_len: U256,
     limit: usize,
 }
@@ -22,7 +23,7 @@ impl Memory {
     /// Create a new memory with the given limit.
     pub fn new(limit: usize) -> Self {
         Self {
-            data: Vec::new(),
+            data: SmallVec::new(),
             effective_len: U256::zero(),
             limit,
         }
@@ -49,7 +50,7 @@ impl Memory {
     }
 
     /// Return the full memory.
-    pub fn data(&self) -> &Vec<u8> {
+    pub fn data(&self) -> &SmallVec<[u8; 1024]> {
         &self.data
     }
 

@@ -1,4 +1,11 @@
-use std::{collections::{HashMap, HashSet}, ffi::OsStr, path::PathBuf, str::FromStr, sync::{atomic::AtomicBool, Arc, Mutex}, time::{Duration, Instant}};
+use std::{
+    collections::{HashMap, HashSet},
+    ffi::OsStr,
+    path::PathBuf,
+    str::FromStr,
+    sync::{atomic::AtomicBool, Arc, Mutex},
+    time::{Duration, Instant},
+};
 
 use sha3::{Digest, Keccak256};
 
@@ -39,7 +46,11 @@ pub fn execute_test_suit(
     inspector: &mut dyn Inspector,
 ) -> Result<(), TestError> {
     if path.file_name() == Some(OsStr::new("ValueOverflow.json")) {
-        return Ok(())
+        return Ok(());
+    }
+    let path_str = path.to_str().unwrap();
+    if path_str.contains("stTimeConsuming") || path_str.contains("vmPerformance") {
+        return Ok(());
     }
     let json_reader = std::fs::read(&path).unwrap();
     let suit: TestSuit = serde_json::from_reader(&*json_reader)?;
@@ -239,12 +250,18 @@ pub fn run<INSP: 'static + Inspector + Clone + Send>(test_files: Vec<PathBuf>, i
                         return;
                     }
                     //println!("Test:{:?}",test_path);
-                    if let Err(err) = execute_test_suit(&test_path, &elapsed, &mut insp as &mut dyn Inspector)
+                    if let Err(err) =
+                        execute_test_suit(&test_path, &elapsed, &mut insp as &mut dyn Inspector)
                     {
                         endjob.store(true, Ordering::SeqCst);
                         println!("\n{:?} failed: {}\n", test_path, err);
                         return;
                     }
+                    println!(
+                        "\nTest:{:?} time:{:?}\n",
+                        test_path,
+                        elapsed.lock().unwrap()
+                    );
                     console_bar.inc(1);
                 })
                 .unwrap(),
@@ -254,5 +271,5 @@ pub fn run<INSP: 'static + Inspector + Clone + Send>(test_files: Vec<PathBuf>, i
         let _ = handler.join();
     }
     console_bar.finish_at_current_pos();
-    println!("Finished execution. Time:{:?}",elapsed.lock().unwrap());
+    println!("Finished execution. Time:{:?}", elapsed.lock().unwrap());
 }
