@@ -254,5 +254,5 @@ pub fn run<INSP: 'static + Inspector + Clone + Send>(test_files: Vec<PathBuf>, i
         let _ = handler.join();
     }
     console_bar.finish_at_current_pos();
-    println!("Finished execution. Time:{:?}",elapsed.lock().unwrap());
+    println!("\nFinished execution. Time:{:?}\n",elapsed.lock().unwrap());
 }

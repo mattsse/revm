@@ -6,7 +6,7 @@ use primitive_types::U256;
 use super::{contract::Contract, memory::Memory, stack::Stack};
 use crate::{error::ExitReason, opcode::Control, spec::Spec, Handler};
 
-pub const STACK_LIMIT: u64 = 1024;
+pub const STACK_LIMIT: usize = 1024;
 pub const CALL_STACK_LIMIT: u64 = 1024;
 
 pub struct Machine {
@@ -133,7 +133,7 @@ impl Machine {
             program_counter: 0,
             return_range: Range::default(),
             memory: Memory::new(usize::MAX),
-            stack: Stack::new(STACK_LIMIT as usize),
+            stack: Stack::new(),
             return_data_buffer: Bytes::new(),
             contract,
             gas: Gas::new(gas_limit),
