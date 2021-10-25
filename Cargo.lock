@@ -1023,6 +1023,7 @@ dependencies = [
  "primitive-types",
  "ripemd160",
  "sha2",
+ "sha3",
  "substrate-bn",
 ]
 
