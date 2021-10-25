@@ -2,10 +2,10 @@ use crate::{
     gas_query, ExitError, Precompile, PrecompileOutput, PrecompileResult, StandardPrecompileFn,
 };
 use core::{cmp::min, convert::TryFrom};
-// use k256::{
-//     ecdsa::{recoverable, signature::Signer, Error, SigningKey},
-//     EncodedPoint as K256PublicKey,
-// };
+use k256::{
+    ecdsa::{recoverable, signature::Signer, Error, SigningKey},
+    EncodedPoint as K256PublicKey,
+};
 use parity_crypto::publickey::{public_to_address, recover, Error as ParityCryptoError, Signature};
 use primitive_types::{H160 as Address, H256};
 use sha3::{Digest, Keccak256};
@@ -25,33 +25,33 @@ expected public key:0x3a514176466fa815ed481ffad09110a2d344f6c9b78c1d14afc351c3a5
 we are getting: 04162e3d88fea6af41afd601465842f879cc5281cad608b91449e8f0b132c3145baccb65430a74cc466061f575dc2060ba0c0aef7307941cc581e9f35a912d442b
 */
 // return padded address as H256
-// fn secp256k1_ecdsa_recover(sig: &mut [u8; 65], msg: &[u8; 32]) -> Result<Address, Error> {
-//     sig[64] -= 27;
-//     let sig = recoverable::Signature::try_from(sig.as_ref()).unwrap();
-//     let verify_key = sig.recover_verify_key(msg)?;
-//     let uncompressed_pub_key = K256PublicKey::from(&verify_key).decompress();
-//     if let Some(public_key) = uncompressed_pub_key {
-//         let public_key = public_key.as_bytes();
-//         debug_assert_eq!(public_key[0], 0x04);
-//         let hash = if public_key[0] == 0x04 {
-//             println!("\n\n public_key {:?} \n\n",hex::encode(public_key));
-//             let hash = Keccak256::digest(public_key[1..].as_ref());
-//             println!("\n\n hash {:?} \n\n",hex::encode(hash));
-//             hash
-//         } else {
-//             Keccak256::digest(&public_key[1..])
-//         };
-//         //let hash = Keccak256::digest(&public_key[1..]);
-//         let mut address = Address::zero();
-//         address.as_bytes_mut().copy_from_slice(&hash[12..]);
-//         Ok(address)
-//     } else {
-//         Err(Error::new())
-//     }
-// }
+fn secp256k1_ecdsa_recover(sig: &mut [u8; 65], msg: &[u8; 32]) -> Result<Address, Error> {
+    sig[64] -= 27;
+    let sig = recoverable::Signature::try_from(sig.as_ref()).unwrap();
+    let verify_key = sig.recover_verify_key(msg)?;
+    let uncompressed_pub_key = K256PublicKey::from(&verify_key).decompress();
+    if let Some(public_key) = uncompressed_pub_key {
+        let public_key = public_key.as_bytes();
+        debug_assert_eq!(public_key[0], 0x04);
+        let hash = if public_key[0] == 0x04 {
+            println!("\n\n public_key {:?} \n\n",hex::encode(public_key));
+            let hash = Keccak256::digest(public_key[1..].as_ref());
+            println!("\n\n hash {:?} \n\n",hex::encode(hash));
+            hash
+        } else {
+            Keccak256::digest(&public_key[1..])
+        };
+        //let hash = Keccak256::digest(&public_key[1..]);
+        let mut address = Address::zero();
+        address.as_bytes_mut().copy_from_slice(&hash[12..]);
+        Ok(address)
+    } else {
+        Err(Error::new())
+    }
+}
 
 
-fn secp256k1_ecdsa_recover(
+fn pre_secp256k1_ecdsa_recover(
     sig: &mut [u8; 65],
     msg: &[u8; 32],
 ) -> Result<Address, ParityCryptoError> {
