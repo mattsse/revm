@@ -427,7 +427,7 @@ impl JournaledState {
         self.journal
             .iter_mut()
             .rev()
-            .take(leng - checkpoint.journal_i)
+            .take(leng.saturating_sub(checkpoint.journal_i))
             .for_each(|cs| Self::journal_revert(state, mem::take(cs), is_spurious_dragon_enabled));
 
         self.logs.truncate(checkpoint.log_i);
