@@ -19,8 +19,8 @@ workspace = true
 
 [dependencies]
 # revm
-primitives.workspace = true
-bytecode.workspace = true
+primitives = { package = "revm-primitives", version = "43.0.0", default-features = false }
+bytecode = { package = "revm-bytecode", version = "43.0.0", default-features = false }
 
 # alloy
 alloy-eip7928.workspace = true
